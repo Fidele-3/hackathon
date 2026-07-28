@@ -38,12 +38,14 @@ class User(AbstractBaseUser, PermissionsMixin):
     LEVEL_DISTRICT_OFFICER = "district_officer"
     LEVEL_SECTOR_OFFICER = "sector_officer"
     LEVEL_CELL_OFFICER = "cell_officer"
+    LEVEL_BUYER = "buyer"
     USER_LEVEL_CHOICES = [
         (LEVEL_CITIZEN, "Citizen / Farmer"),
         (LEVEL_NATIONAL_ADMIN, "National Admin"),
         (LEVEL_DISTRICT_OFFICER, "District Officer"),
         (LEVEL_SECTOR_OFFICER, "Sector Officer"),
         (LEVEL_CELL_OFFICER, "Cell Officer"),
+        (LEVEL_BUYER, "Produce Buyer"),
     ]
 
     GENDER_CHOICES = [("male", "Male"), ("female", "Female")]

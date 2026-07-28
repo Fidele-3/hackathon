@@ -1,6 +1,6 @@
 from django.contrib import admin
 
-from .models import Cell, District, OfficerProfile, Province, Sector, User, Village
+from .models import BuyerProfile, Cell, District, OfficerProfile, Province, Sector, User, Village
 
 
 @admin.register(User)
@@ -16,6 +16,12 @@ class UserAdmin(admin.ModelAdmin):
 class OfficerProfileAdmin(admin.ModelAdmin):
     list_display = ("user", "level", "specialization", "managed_district", "managed_sector", "managed_cell", "is_active")
     list_filter = ("level", "specialization", "is_active")
+
+
+@admin.register(BuyerProfile)
+class BuyerProfileAdmin(admin.ModelAdmin):
+    list_display = ("business_name", "user", "payment_method", "is_verified")
+    list_filter = ("is_verified", "payment_method")
 
 
 admin.site.register(Province)

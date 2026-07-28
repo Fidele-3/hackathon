@@ -1,4 +1,5 @@
 from .addresses import Cell, District, Province, Sector, Village
+from .buyer import BuyerProfile
 from .officer import OfficerProfile
 from .user import User, UserManager
 
@@ -11,4 +12,5 @@ __all__ = [
     "User",
     "UserManager",
     "OfficerProfile",
+    "BuyerProfile",
 ]

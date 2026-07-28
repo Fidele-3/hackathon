@@ -11,3 +11,10 @@ def find_cell_officer(cell, category):
     return OfficerProfile.objects.filter(
         level=OfficerProfile.LEVEL_CELL, managed_cell=cell, specialization=specialization, is_active=True
     ).first()
+
+
+def find_district_officer(district, category):
+    specialization = CATEGORY_TO_SPECIALIZATION[category]
+    return OfficerProfile.objects.filter(
+        level=OfficerProfile.LEVEL_DISTRICT, managed_district=district, specialization=specialization, is_active=True
+    ).first()

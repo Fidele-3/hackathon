@@ -10,17 +10,18 @@ from users.permissions import IsOfficer
 from users.scoping import can_manage_category, officer_jurisdiction_filter
 
 
+def _jurisdiction_queryset(user):
+    land_jurisdiction = officer_jurisdiction_filter(user, "land__cell")
+    livestock_jurisdiction = officer_jurisdiction_filter(user, "livestock_location__cell")
+    return ResourceRequest.objects.filter(land_jurisdiction) | ResourceRequest.objects.filter(livestock_jurisdiction)
+
+
 class OfficerResourceRequestListView(generics.ListAPIView):
     serializer_class = ResourceRequestSerializer
     permission_classes = [IsOfficer]
 
     def get_queryset(self):
-        user = self.request.user
-        land_jurisdiction = officer_jurisdiction_filter(user, "land__cell")
-        livestock_jurisdiction = officer_jurisdiction_filter(user, "livestock_location__cell")
-        return ResourceRequest.objects.filter(land_jurisdiction) | ResourceRequest.objects.filter(
-            livestock_jurisdiction
-        )
+        return _jurisdiction_queryset(self.request.user)
 
 
 class ResourceRequestDecisionView(generics.GenericAPIView):
@@ -28,7 +29,10 @@ class ResourceRequestDecisionView(generics.GenericAPIView):
     permission_classes = [IsOfficer]
 
     def patch(self, request, pk):
-        instance = get_object_or_404(ResourceRequest, pk=pk)
+        # Jurisdiction is part of the lookup itself, not a check performed
+        # after fetching by raw pk -- a request outside the officer's
+        # territory 404s rather than being reachable at all.
+        instance = get_object_or_404(_jurisdiction_queryset(request.user), pk=pk)
         if not can_manage_category(request.user, instance.category):
             raise PermissionDenied(f"Only a {instance.category} specialist can decide this request.")
 
