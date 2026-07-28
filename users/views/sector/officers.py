@@ -1,14 +1,14 @@
 from rest_framework import generics, status
 from rest_framework.response import Response
 
-from users.permissions import IsDistrictOfficer
+from users.permissions import IsSectorOfficer
 from users.serializers.common.profile import MeSerializer
-from users.serializers.district.officers import CreateSectorOfficerSerializer
+from users.serializers.sector.officers import CreateCellOfficerSerializer
 
 
-class CreateSectorOfficerView(generics.CreateAPIView):
-    serializer_class = CreateSectorOfficerSerializer
-    permission_classes = [IsDistrictOfficer]
+class CreateCellOfficerView(generics.CreateAPIView):
+    serializer_class = CreateCellOfficerSerializer
+    permission_classes = [IsSectorOfficer]
 
     def create(self, request, *args, **kwargs):
         serializer = self.get_serializer(data=request.data)

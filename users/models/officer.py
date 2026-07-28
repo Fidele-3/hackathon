@@ -1,16 +1,18 @@
 from django.db import models
 
-from .addresses import Cell, District
+from .addresses import Cell, District, Sector
 from .user import User
 
 
 class OfficerProfile(models.Model):
     LEVEL_NATIONAL = "national"
     LEVEL_DISTRICT = "district"
+    LEVEL_SECTOR = "sector"
     LEVEL_CELL = "cell"
     LEVEL_CHOICES = [
         (LEVEL_NATIONAL, "National"),
         (LEVEL_DISTRICT, "District"),
+        (LEVEL_SECTOR, "Sector"),
         (LEVEL_CELL, "Cell"),
     ]
 
@@ -28,6 +30,9 @@ class OfficerProfile(models.Model):
     managed_district = models.ForeignKey(
         District, null=True, blank=True, on_delete=models.SET_NULL, related_name="district_officers"
     )
+    managed_sector = models.ForeignKey(
+        Sector, null=True, blank=True, on_delete=models.SET_NULL, related_name="sector_officers"
+    )
     managed_cell = models.ForeignKey(
         Cell, null=True, blank=True, on_delete=models.SET_NULL, related_name="cell_officers"
     )
@@ -43,8 +48,17 @@ class OfficerProfile(models.Model):
         constraints = [
             models.CheckConstraint(
                 check=(
-                    models.Q(level="national", managed_district__isnull=True, managed_cell__isnull=True)
-                    | models.Q(level="district", managed_district__isnull=False, managed_cell__isnull=True)
+                    models.Q(
+                        level="national", managed_district__isnull=True,
+                        managed_sector__isnull=True, managed_cell__isnull=True,
+                    )
+                    | models.Q(
+                        level="district", managed_district__isnull=False,
+                        managed_sector__isnull=True, managed_cell__isnull=True,
+                    )
+                    | models.Q(
+                        level="sector", managed_sector__isnull=False, managed_cell__isnull=True,
+                    )
                     | models.Q(level="cell", managed_cell__isnull=False)
                 ),
                 name="officer_jurisdiction_matches_level",

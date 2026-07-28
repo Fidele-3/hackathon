@@ -12,7 +12,12 @@ from users.serializers.common.auth import GoogleLoginSerializer, LoginSerializer
 from users.serializers.common.profile import MeSerializer
 from users.utils import issue_tokens, resolve_and_authenticate
 
-OFFICER_LEVELS = [User.LEVEL_NATIONAL_ADMIN, User.LEVEL_DISTRICT_OFFICER, User.LEVEL_CELL_OFFICER]
+OFFICER_LEVELS = [
+    User.LEVEL_NATIONAL_ADMIN,
+    User.LEVEL_DISTRICT_OFFICER,
+    User.LEVEL_SECTOR_OFFICER,
+    User.LEVEL_CELL_OFFICER,
+]
 
 
 class OfficerLoginView(APIView):

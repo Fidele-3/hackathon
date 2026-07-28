@@ -14,7 +14,7 @@ class UserAdmin(admin.ModelAdmin):
 
 @admin.register(OfficerProfile)
 class OfficerProfileAdmin(admin.ModelAdmin):
-    list_display = ("user", "level", "specialization", "managed_district", "managed_cell", "is_active")
+    list_display = ("user", "level", "specialization", "managed_district", "managed_sector", "managed_cell", "is_active")
     list_filter = ("level", "specialization", "is_active")
 
 

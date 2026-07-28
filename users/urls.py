@@ -6,8 +6,9 @@ from .views.citizen.auth import RegisterView
 from .views.common.auth import GoogleLoginView, OfficerLoginView
 from .views.common.availability import CheckAvailabilityView
 from .views.common.profile import MeView
-from .views.district.officers import CreateCellOfficerView
+from .views.district.officers import CreateSectorOfficerView
 from .views.national.officers import CreateDistrictOfficerView
+from .views.sector.officers import CreateCellOfficerView
 
 urlpatterns = [
     path("register/", RegisterView.as_view(), name="citizen-register"),
@@ -18,5 +19,6 @@ urlpatterns = [
     path("me/", MeView.as_view(), name="me"),
     path("check-availability/", CheckAvailabilityView.as_view(), name="check-availability"),
     path("officers/district/", CreateDistrictOfficerView.as_view(), name="create-district-officer"),
+    path("officers/sector/", CreateSectorOfficerView.as_view(), name="create-sector-officer"),
     path("officers/cell/", CreateCellOfficerView.as_view(), name="create-cell-officer"),
 ]

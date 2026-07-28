@@ -1,10 +1,10 @@
 from django.utils.crypto import get_random_string
 from rest_framework import serializers
 
-from users.models import OfficerProfile, Sector, User
+from users.models import Cell, OfficerProfile, User
 
 
-class CreateSectorOfficerSerializer(serializers.Serializer):
+class CreateCellOfficerSerializer(serializers.Serializer):
     phone_number = serializers.CharField()
     national_id = serializers.CharField()
     full_name = serializers.CharField()
@@ -12,7 +12,7 @@ class CreateSectorOfficerSerializer(serializers.Serializer):
     work_email = serializers.EmailField(required=False, allow_null=True)
     dob = serializers.DateField(required=False, allow_null=True)
     gender = serializers.ChoiceField(choices=User.GENDER_CHOICES, required=False, allow_null=True)
-    managed_sector = serializers.PrimaryKeyRelatedField(queryset=Sector.objects.all())
+    managed_cell = serializers.PrimaryKeyRelatedField(queryset=Cell.objects.all())
     specialization = serializers.ChoiceField(choices=OfficerProfile.SPECIALIZATION_CHOICES)
 
     def validate_phone_number(self, value):
@@ -30,15 +30,15 @@ class CreateSectorOfficerSerializer(serializers.Serializer):
             raise serializers.ValidationError("A user with this email already exists.")
         return value
 
-    def validate_managed_sector(self, value):
-        district_officer = self.context["request"].user
-        managed_district = district_officer.officer_profile.managed_district
-        if value.district_id != managed_district.id:
-            raise serializers.ValidationError("This sector is outside your managed district.")
+    def validate_managed_cell(self, value):
+        sector_officer = self.context["request"].user
+        managed_sector = sector_officer.officer_profile.managed_sector
+        if value.sector_id != managed_sector.id:
+            raise serializers.ValidationError("This cell is outside your managed sector.")
         return value
 
     def create(self, validated_data):
-        managed_sector = validated_data.pop("managed_sector")
+        managed_cell = validated_data.pop("managed_cell")
         specialization = validated_data.pop("specialization")
         work_email = validated_data.pop("work_email", None)
         created_by = self.context["request"].user
@@ -46,14 +46,14 @@ class CreateSectorOfficerSerializer(serializers.Serializer):
         raw_password = get_random_string(12)
         user = User.objects.create_user(
             password=raw_password,
-            user_level=User.LEVEL_SECTOR_OFFICER,
+            user_level=User.LEVEL_CELL_OFFICER,
             **validated_data,
         )
         OfficerProfile.objects.create(
             user=user,
-            level=OfficerProfile.LEVEL_SECTOR,
+            level=OfficerProfile.LEVEL_CELL,
             specialization=specialization,
-            managed_sector=managed_sector,
+            managed_cell=managed_cell,
             work_email=work_email,
             created_by=created_by,
         )

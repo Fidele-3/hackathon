@@ -36,11 +36,13 @@ class User(AbstractBaseUser, PermissionsMixin):
     LEVEL_CITIZEN = "citizen"
     LEVEL_NATIONAL_ADMIN = "national_admin"
     LEVEL_DISTRICT_OFFICER = "district_officer"
+    LEVEL_SECTOR_OFFICER = "sector_officer"
     LEVEL_CELL_OFFICER = "cell_officer"
     USER_LEVEL_CHOICES = [
         (LEVEL_CITIZEN, "Citizen / Farmer"),
         (LEVEL_NATIONAL_ADMIN, "National Admin"),
         (LEVEL_DISTRICT_OFFICER, "District Officer"),
+        (LEVEL_SECTOR_OFFICER, "Sector Officer"),
         (LEVEL_CELL_OFFICER, "Cell Officer"),
     ]
 
@@ -79,5 +81,6 @@ class User(AbstractBaseUser, PermissionsMixin):
         return self.user_level in (
             self.LEVEL_NATIONAL_ADMIN,
             self.LEVEL_DISTRICT_OFFICER,
+            self.LEVEL_SECTOR_OFFICER,
             self.LEVEL_CELL_OFFICER,
         )
