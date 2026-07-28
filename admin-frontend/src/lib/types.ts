@@ -161,6 +161,9 @@ export interface FarmerIssue {
   officer_response: string;
   resolved_at: string | null;
   created_at: string;
+  latitude: number | null;
+  longitude: number | null;
+  cell_name: string | null;
 }
 
 export interface MessageAttachment {

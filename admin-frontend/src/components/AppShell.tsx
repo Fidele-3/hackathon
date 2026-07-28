@@ -1,5 +1,6 @@
 "use client";
 
+import { useState } from "react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import {
@@ -16,6 +17,8 @@ import {
   Sparkles,
   TrendingUp,
   LogOut,
+  Brain,
+  Map as MapIcon,
 } from "lucide-react";
 import { useAuthStore } from "@/lib/auth-store";
 import type { UserLevel } from "@/lib/types";
@@ -78,6 +81,12 @@ const NAV_ITEMS: NavItem[] = [
     allowed: ["national_admin", "district_officer", "sector_officer", "cell_officer"],
   },
   {
+    href: "/map",
+    label: "Map",
+    icon: MapIcon,
+    allowed: ["national_admin", "district_officer", "sector_officer", "cell_officer"],
+  },
+  {
     href: "/ai-conversations",
     label: "AI Conversations",
     icon: MessagesSquare,
@@ -112,10 +121,10 @@ export function AppShell({ children }: { children: React.ReactNode }) {
 
   return (
     <div className="flex min-h-screen">
-      <aside className="flex w-64 flex-shrink-0 flex-col border-r border-neutral-200 bg-white dark:border-neutral-800 dark:bg-neutral-950">
-        <div className="border-b border-neutral-200 px-5 py-4 dark:border-neutral-800">
-          <span className="text-lg font-semibold text-emerald-700 dark:text-emerald-500">Ubuhinzi</span>
-          <p className="text-xs text-neutral-500">Officer Console</p>
+      <aside className="flex w-64 flex-shrink-0 flex-col bg-emerald-950 border-r border-emerald-500/30 shadow-2xl">
+        <div className="border-b border-emerald-500/30 px-5 py-4">
+          <span className="text-lg font-semibold text-white">E-Hinga</span>
+          <p className="text-xs text-emerald-300">Officer Console</p>
         </div>
         <nav className="flex-1 space-y-1 overflow-y-auto p-3">
           {items.map((item) => {
@@ -127,8 +136,8 @@ export function AppShell({ children }: { children: React.ReactNode }) {
                 href={item.href}
                 className={`flex items-center gap-3 rounded-md px-3 py-2 text-sm font-medium transition ${
                   active
-                    ? "bg-emerald-50 text-emerald-700 dark:bg-emerald-950 dark:text-emerald-400"
-                    : "text-neutral-600 hover:bg-neutral-100 dark:text-neutral-300 dark:hover:bg-neutral-800"
+                    ? "bg-emerald-700/40 text-white"
+                    : "text-emerald-200 hover:bg-emerald-800/40 hover:text-white"
                 }`}
               >
                 <Icon size={18} />
@@ -137,20 +146,45 @@ export function AppShell({ children }: { children: React.ReactNode }) {
             );
           })}
         </nav>
-        <div className="border-t border-neutral-200 p-3 dark:border-neutral-800">
+        <div className="border-t border-emerald-500/30 p-3 bg-emerald-900/40">
           <div className="mb-2 px-2">
-            <p className="truncate text-sm font-medium text-neutral-800 dark:text-neutral-100">{user?.full_name}</p>
-            <p className="text-xs text-neutral-500">{level ? LEVEL_LABELS[level] : ""}</p>
+            <p className="truncate text-sm font-medium text-white">{user?.full_name}</p>
+            <p className="text-xs text-emerald-300">{level ? LEVEL_LABELS[level] : ""}</p>
           </div>
           <button
             onClick={handleLogout}
-            className="flex w-full items-center gap-2 rounded-md px-3 py-2 text-sm font-medium text-neutral-600 hover:bg-neutral-100 dark:text-neutral-300 dark:hover:bg-neutral-800"
+            className="flex w-full items-center gap-2 rounded-md px-3 py-2 text-sm font-medium text-emerald-200 hover:bg-emerald-800/40 hover:text-white"
           >
             <LogOut size={16} /> Log out
           </button>
         </div>
       </aside>
       <main className="flex-1 overflow-y-auto bg-neutral-50 p-8 dark:bg-neutral-900">{children}</main>
+
+      <FloatingAIButton />
+    </div>
+  );
+}
+
+function FloatingAIButton() {
+  const [hovered, setHovered] = useState(false);
+
+  return (
+    <div className="fixed bottom-8 right-8 z-50">
+      {hovered && (
+        <div className="mb-2 px-4 py-2 bg-emerald-700 text-white rounded-xl shadow-lg text-sm font-medium fade-in-top">
+          Ask E-Hinga AI
+        </div>
+      )}
+      <Link
+        href="/ai-conversations"
+        onMouseEnter={() => setHovered(true)}
+        onMouseLeave={() => setHovered(false)}
+        className="flex h-16 w-16 items-center justify-center rounded-2xl bg-gradient-to-br from-emerald-600 to-emerald-500 shadow-xl border border-emerald-400 transition-all duration-300 hover:scale-105 hover:from-emerald-500 hover:to-emerald-400"
+        title="AI Assistant"
+      >
+        <Brain className="h-8 w-8 text-white" />
+      </Link>
     </div>
   );
 }

@@ -2,8 +2,8 @@ import type { Metadata } from "next";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "Ubuhinzi Admin",
-  description: "Ubuhinzi government officer & admin console",
+  title: "E-Hinga Admin",
+  description: "E-Hinga government officer & admin console",
 };
 
 export default function RootLayout({

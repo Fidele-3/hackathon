@@ -4,7 +4,7 @@ import { ReactNode } from "react";
 
 export function Card({ children, className = "" }: { children: ReactNode; className?: string }) {
   return (
-    <div className={`rounded-lg border border-neutral-200 bg-white shadow-sm dark:border-neutral-800 dark:bg-neutral-900 ${className}`}>
+    <div className={`rounded-lg border border-emerald-100 bg-white shadow-sm dark:border-emerald-900/40 dark:bg-neutral-900 ${className}`}>
       {children}
     </div>
   );
@@ -68,12 +68,13 @@ export function Button({
   variant = "primary",
   className = "",
   ...props
-}: React.ButtonHTMLAttributes<HTMLButtonElement> & { variant?: "primary" | "secondary" | "danger" }) {
+}: React.ButtonHTMLAttributes<HTMLButtonElement> & { variant?: "primary" | "secondary" | "danger" | "warning" }) {
   const base = "inline-flex items-center justify-center rounded-md px-3 py-1.5 text-sm font-medium transition disabled:opacity-50 disabled:cursor-not-allowed";
   const variants = {
     primary: "bg-emerald-600 text-white hover:bg-emerald-700",
     secondary: "bg-neutral-100 text-neutral-800 hover:bg-neutral-200 dark:bg-neutral-800 dark:text-neutral-100 dark:hover:bg-neutral-700",
     danger: "bg-red-600 text-white hover:bg-red-700",
+    warning: "bg-amber-500 text-white hover:bg-amber-600",
   };
   return (
     <button className={`${base} ${variants[variant]} ${className}`} {...props}>
