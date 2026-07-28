@@ -158,13 +158,31 @@ Escalate an **AI** conversation to a human cell officer, creating a `FarmerIssue
     "assigned_officer": { "...": "MeSerializer shape" },
     "officer_response": "",
     "resolved_at": null,
-    "created_at": "2026-07-01T09:10:00Z"
+    "created_at": "2026-07-01T09:10:00Z",
+    "latitude": -1.9441,
+    "longitude": 30.0619,
+    "cell_name": "Kimisagara",
+    "ai_query": {
+      "id": 42,
+      "query_type": "crop_diagnosis",
+      "model_used": "gemini-2.5-flash",
+      "input_text": "My beans are showing yellow leaves, what should I do?",
+      "input_image": "https://.../ubuhinzi/ai_query_images/2026/7/<uuid>-photo.jpg",
+      "input_audio": null,
+      "response_text": "This looks like early-stage nitrogen deficiency...",
+      "confidence_score": null,
+      "created_at": "2026-07-01T09:05:00Z"
+    }
   },
   "officer_conversation": { "...": "same shape as a conversations/ list item, channel=\"officer\"" }
 }
 ```
 
 `issue.status` is one of `"open"` | `"assigned"` | `"resolved"` | `"rejected"` — always `"assigned"` immediately after escalation.
+
+`issue.latitude`/`issue.longitude`/`issue.cell_name` are read off the issue's land or livestock location's cell (whichever the issue targets) — all `null` if that cell has no coordinates on file.
+
+`issue.ai_query` is `null` unless the AI conversation had already produced at least one reply before escalation, in which case it's the most recent one: what the farmer asked (and any photo/voice note attached, via `input_image`/`input_audio`), what model answered, and what it said — so an officer picking up the issue can see what the AI already tried before them. `query_type` is one of `"crop_diagnosis"` | `"livestock_query"` | `"general_qa"` | `"insight_generation"` | `"voice_message"`.
 
 ### Errors
 

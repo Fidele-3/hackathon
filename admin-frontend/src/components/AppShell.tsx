@@ -19,6 +19,7 @@ import {
   LogOut,
   Brain,
   Map as MapIcon,
+  Bot,
 } from "lucide-react";
 import { useAuthStore } from "@/lib/auth-store";
 import type { UserLevel } from "@/lib/types";
@@ -87,8 +88,14 @@ const NAV_ITEMS: NavItem[] = [
     allowed: ["national_admin", "district_officer", "sector_officer", "cell_officer"],
   },
   {
+    href: "/ai-assistant",
+    label: "AI Assistant",
+    icon: Bot,
+    allowed: ["national_admin", "district_officer", "sector_officer", "cell_officer"],
+  },
+  {
     href: "/ai-conversations",
-    label: "AI Conversations",
+    label: "Farmers' AI Chats",
     icon: MessagesSquare,
     allowed: ["national_admin", "district_officer", "sector_officer", "cell_officer"],
   },
@@ -121,12 +128,27 @@ export function AppShell({ children }: { children: React.ReactNode }) {
 
   return (
     <div className="flex min-h-screen">
-      <aside className="flex w-64 flex-shrink-0 flex-col bg-emerald-950 border-r border-emerald-500/30 shadow-2xl">
-        <div className="border-b border-emerald-500/30 px-5 py-4">
+      <aside className="relative flex w-64 flex-shrink-0 flex-col overflow-hidden bg-emerald-950 border-r border-emerald-500/30 shadow-2xl">
+        {/* Decorative corner arcs */}
+        <div className="pointer-events-none absolute inset-0 overflow-hidden">
+          <div className="absolute top-0 left-0 h-48 w-48">
+            <div className="absolute top-0 left-0 h-full w-full -translate-x-1/2 -translate-y-1/2 rounded-full border-[8px] border-emerald-400/30" />
+            <div className="absolute top-0 left-0 h-32 w-32 -translate-x-1/3 -translate-y-1/3 rounded-full border-[6px] border-emerald-300/40" />
+          </div>
+          <div className="absolute bottom-0 left-0 h-48 w-48">
+            <div className="absolute bottom-0 left-0 h-full w-full -translate-x-1/2 translate-y-1/2 rounded-full border-[8px] border-emerald-400/30" />
+            <div className="absolute bottom-0 left-0 h-32 w-32 -translate-x-1/3 translate-y-1/3 rounded-full border-[6px] border-emerald-300/40" />
+          </div>
+        </div>
+
+        <div className="relative z-10 border-b border-emerald-500/30 px-5 py-4">
           <span className="text-lg font-semibold text-white">E-Hinga</span>
           <p className="text-xs text-emerald-300">Officer Console</p>
         </div>
-        <nav className="flex-1 space-y-1 overflow-y-auto p-3">
+        <nav className="relative z-10 flex-1 space-y-1 overflow-y-auto p-3">
+          <div className="mb-3 truncate rounded-lg border border-emerald-400/40 bg-emerald-600/40 px-3 py-2 text-sm font-semibold uppercase tracking-wider text-emerald-200 backdrop-blur-sm">
+            Main Menu
+          </div>
           {items.map((item) => {
             const active = pathname === item.href || pathname.startsWith(`${item.href}/`);
             const Icon = item.icon;
@@ -134,10 +156,10 @@ export function AppShell({ children }: { children: React.ReactNode }) {
               <Link
                 key={item.href}
                 href={item.href}
-                className={`flex items-center gap-3 rounded-md px-3 py-2 text-sm font-medium transition ${
+                className={`group flex items-center gap-3 rounded-lg border px-3 py-2.5 text-sm font-medium transition-all duration-300 ${
                   active
-                    ? "bg-emerald-700/40 text-white"
-                    : "text-emerald-200 hover:bg-emerald-800/40 hover:text-white"
+                    ? "border-emerald-400 bg-emerald-600 text-white shadow-md shadow-emerald-600/50"
+                    : "border-emerald-500/30 text-emerald-100 hover:border-emerald-400/50 hover:bg-emerald-600/50 hover:text-white"
                 }`}
               >
                 <Icon size={18} />
@@ -146,14 +168,14 @@ export function AppShell({ children }: { children: React.ReactNode }) {
             );
           })}
         </nav>
-        <div className="border-t border-emerald-500/30 p-3 bg-emerald-900/40">
+        <div className="relative z-10 border-t border-emerald-500/30 bg-emerald-900/40 p-3 backdrop-blur-sm">
           <div className="mb-2 px-2">
             <p className="truncate text-sm font-medium text-white">{user?.full_name}</p>
             <p className="text-xs text-emerald-300">{level ? LEVEL_LABELS[level] : ""}</p>
           </div>
           <button
             onClick={handleLogout}
-            className="flex w-full items-center gap-2 rounded-md px-3 py-2 text-sm font-medium text-emerald-200 hover:bg-emerald-800/40 hover:text-white"
+            className="flex w-full items-center gap-2 rounded-lg border border-red-500/30 px-3 py-2 text-sm font-medium text-red-200 transition-all duration-300 hover:border-red-400/50 hover:bg-red-600/30 hover:text-red-100"
           >
             <LogOut size={16} /> Log out
           </button>
@@ -177,7 +199,7 @@ function FloatingAIButton() {
         </div>
       )}
       <Link
-        href="/ai-conversations"
+        href="/ai-assistant"
         onMouseEnter={() => setHovered(true)}
         onMouseLeave={() => setHovered(false)}
         className="flex h-16 w-16 items-center justify-center rounded-2xl bg-gradient-to-br from-emerald-600 to-emerald-500 shadow-xl border border-emerald-400 transition-all duration-300 hover:scale-105 hover:from-emerald-500 hover:to-emerald-400"

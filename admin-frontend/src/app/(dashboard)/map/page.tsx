@@ -4,9 +4,8 @@ import { useEffect, useRef, useState } from "react";
 import L from "leaflet";
 import { useAuthStore } from "@/lib/auth-store";
 import { api, ApiError } from "@/lib/api";
-import { useList } from "@/lib/hooks";
 import { Button, Card, ErrorBanner, PageHeader, Spinner } from "@/components/ui";
-import type { FarmerIssue, Insight } from "@/lib/types";
+import type { FarmerIssue, Insight, Paginated } from "@/lib/types";
 
 type FarmerIssueGeo = FarmerIssue & { latitude: number | null; longitude: number | null; cell_name: string | null };
 
@@ -29,7 +28,18 @@ function markerIcon(color: string) {
 
 export default function MapPage() {
   const user = useAuthStore((s) => s.user);
-  const { items, loading, error } = useList<FarmerIssueGeo>("/messaging/officer/issues/");
+  const [items, setItems] = useState<FarmerIssueGeo[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    setLoading(true);
+    api
+      .get<Paginated<FarmerIssueGeo> | FarmerIssueGeo[]>("/messaging/officer/issues/?page_size=500")
+      .then((data) => setItems(Array.isArray(data) ? data : data.results))
+      .catch((err) => setError(err instanceof ApiError ? err.message : "Failed to load issues."))
+      .finally(() => setLoading(false));
+  }, []);
 
   const mapRef = useRef<L.Map | null>(null);
   const containerRef = useRef<HTMLDivElement | null>(null);

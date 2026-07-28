@@ -126,7 +126,7 @@ REST_FRAMEWORK = {
         "rest_framework.permissions.IsAuthenticated",
     ),
     "DEFAULT_FILTER_BACKENDS": ("django_filters.rest_framework.DjangoFilterBackend",),
-    "DEFAULT_PAGINATION_CLASS": "rest_framework.pagination.PageNumberPagination",
+    "DEFAULT_PAGINATION_CLASS": "config.pagination.StandardPagination",
     "PAGE_SIZE": 50,
     "DEFAULT_RENDERER_CLASSES": ("config.renderers.StandardJSONRenderer",),
     "EXCEPTION_HANDLER": "config.exceptions.custom_exception_handler",

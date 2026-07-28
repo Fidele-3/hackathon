@@ -4,7 +4,9 @@ import { ReactNode } from "react";
 
 export function Card({ children, className = "" }: { children: ReactNode; className?: string }) {
   return (
-    <div className={`rounded-lg border border-emerald-100 bg-white shadow-sm dark:border-emerald-900/40 dark:bg-neutral-900 ${className}`}>
+    <div
+      className={`rounded-lg border border-emerald-100 bg-white/80 shadow-sm backdrop-blur-sm dark:border-emerald-500/20 dark:bg-emerald-950/40 dark:shadow-lg dark:shadow-emerald-950/50 ${className}`}
+    >
       {children}
     </div>
   );
@@ -69,12 +71,16 @@ export function Button({
   className = "",
   ...props
 }: React.ButtonHTMLAttributes<HTMLButtonElement> & { variant?: "primary" | "secondary" | "danger" | "warning" }) {
-  const base = "inline-flex items-center justify-center rounded-md px-3 py-1.5 text-sm font-medium transition disabled:opacity-50 disabled:cursor-not-allowed";
+  const base = "inline-flex items-center justify-center rounded-md px-3 py-1.5 text-sm font-medium transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed";
   const variants = {
-    primary: "bg-emerald-600 text-white hover:bg-emerald-700",
-    secondary: "bg-neutral-100 text-neutral-800 hover:bg-neutral-200 dark:bg-neutral-800 dark:text-neutral-100 dark:hover:bg-neutral-700",
-    danger: "bg-red-600 text-white hover:bg-red-700",
-    warning: "bg-amber-500 text-white hover:bg-amber-600",
+    primary:
+      "bg-gradient-to-br from-emerald-600 to-emerald-500 text-white border border-emerald-400/50 shadow-md shadow-emerald-600/30 hover:from-emerald-500 hover:to-emerald-400 hover:shadow-emerald-500/40",
+    secondary:
+      "bg-neutral-100/80 text-neutral-800 border border-neutral-200 backdrop-blur-sm hover:bg-neutral-200 dark:bg-emerald-900/30 dark:text-emerald-100 dark:border-emerald-500/20 dark:hover:bg-emerald-800/40",
+    danger:
+      "bg-gradient-to-br from-red-600 to-red-500 text-white border border-red-400/50 shadow-md shadow-red-600/30 hover:from-red-500 hover:to-red-400",
+    warning:
+      "bg-gradient-to-br from-amber-500 to-amber-400 text-white border border-amber-300/50 shadow-md shadow-amber-500/30 hover:from-amber-400 hover:to-amber-300",
   };
   return (
     <button className={`${base} ${variants[variant]} ${className}`} {...props}>

@@ -149,6 +149,25 @@ export interface StorageRequest {
 export type IssueStatus = "open" | "assigned" | "resolved" | "rejected";
 export type IssueCategory = "crop" | "livestock";
 
+export type AIQueryType =
+  | "crop_diagnosis"
+  | "livestock_query"
+  | "general_qa"
+  | "insight_generation"
+  | "voice_message";
+
+export interface AIQueryLog {
+  id: number;
+  query_type: AIQueryType;
+  model_used: string;
+  input_text: string;
+  input_image: string | null;
+  input_audio: string | null;
+  response_text: string;
+  confidence_score: number | null;
+  created_at: string;
+}
+
 export interface FarmerIssue {
   id: number;
   category: IssueCategory;
@@ -164,6 +183,7 @@ export interface FarmerIssue {
   latitude: number | null;
   longitude: number | null;
   cell_name: string | null;
+  ai_query: AIQueryLog | null;
 }
 
 export interface MessageAttachment {

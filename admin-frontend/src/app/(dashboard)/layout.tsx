@@ -17,7 +17,11 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
   }, [hydrated, user, router]);
 
   if (!hydrated || !user) {
-    return <div className="flex min-h-screen items-center justify-center text-sm text-neutral-500">Loading…</div>;
+    return (
+      <div className="flex min-h-screen items-center justify-center bg-neutral-50 text-sm text-neutral-500 dark:bg-neutral-900">
+        Loading…
+      </div>
+    );
   }
 
   return <AppShell>{children}</AppShell>;
