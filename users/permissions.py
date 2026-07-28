@@ -16,3 +16,8 @@ class IsDistrictOfficer(BasePermission):
 class IsSectorOfficer(BasePermission):
     def has_permission(self, request, view):
         return bool(request.user and request.user.is_authenticated and request.user.user_level == User.LEVEL_SECTOR_OFFICER)
+
+
+class IsOfficer(BasePermission):
+    def has_permission(self, request, view):
+        return bool(request.user and request.user.is_authenticated and request.user.is_officer)
