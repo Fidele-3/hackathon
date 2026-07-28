@@ -1,4 +1,5 @@
-# UBUHINZI (E-HINGA)  (**Please read the readme to understand everything because 2 minutes video was only forr citizen side, it doesn't have fully features of this project)
+# UBUHINZI (E-HINGA)  
+(**Please read the readme to understand everything because 2 minutes video was only forr citizen side, it doesn't have fully features of this project**)
 
 **Digital Agriculture Platform for Rwanda**
 
