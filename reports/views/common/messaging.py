@@ -7,7 +7,8 @@ from rest_framework.generics import get_object_or_404
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 
-from ai.gemini_client import CHAT_MODEL, GeminiError, generate_content
+from ai.gemini_client import GeminiError
+from ai.orchestration import chat_reply
 from ai.models import AIQueryLog
 from reports.models import Conversation, Message, MessageAttachment
 from reports.serializers.common.escalation import EscalateConversationSerializer
@@ -36,19 +37,42 @@ def _generate_ai_reply(conversation, farmer, body, attachment_file):
     query_type = AIQueryLog.QUERY_CROP_DIAGNOSIS if is_image else AIQueryLog.QUERY_GENERAL_QA
 
     try:
-        response_text = generate_content(CHAT_MODEL, body, image_bytes=image_bytes, image_mime_type=image_mime_type)
+        from ai.model_router import CHAT_MODEL
+
+        if is_image:
+            from ai.orchestration import run_crop_diagnosis
+
+            result = run_crop_diagnosis(
+                user=farmer,
+                text=body,
+                image_bytes=image_bytes,
+                image_mime_type=image_mime_type,
+                image_name=getattr(attachment_file, "name", "crop.jpg"),
+                language="en",
+                auto_escalate=False,
+            )
+            response_text = result["diagnosis"].get("explanation") or result["diagnosis"].get("recommendation") or ""
+            log = AIQueryLog.objects.get(pk=result["diagnosis_id"])
+        else:
+            response_text = chat_reply(text=body, language="en")
+            log = AIQueryLog.objects.create(
+                user=farmer,
+                query_type=query_type,
+                model_used=CHAT_MODEL,
+                input_text=body,
+                response_text=response_text,
+            )
     except GeminiError:
         logger.exception("Gemini call failed for conversation %s", conversation.pk)
         response_text = ""
-
-    log = AIQueryLog.objects.create(
-        user=farmer,
-        query_type=query_type,
-        model_used=CHAT_MODEL,
-        input_text=body,
-        response_text=response_text,
-        input_image=attachment_file if is_image else None,
-    )
+        log = AIQueryLog.objects.create(
+            user=farmer,
+            query_type=query_type,
+            model_used="unavailable",
+            input_text=body,
+            response_text="",
+            input_image=attachment_file if is_image else None,
+        )
 
     reply_body = response_text or (
         "The assistant couldn't process this right now. You can try again, or escalate this "

@@ -64,7 +64,10 @@ TEMPLATES = [
 WSGI_APPLICATION = "config.wsgi.application"
 
 DATABASES = {
-    "default": env.db("DATABASE_URL", default=f"postgres:///ubuhinzi")
+    "default": env.db(
+        "DATABASE_URL",
+        default=f"sqlite:///{BASE_DIR / 'db.sqlite3'}",
+    )
 }
 
 AUTH_USER_MODEL = "users.User"
@@ -139,7 +142,9 @@ SIMPLE_JWT = {
 CORS_ALLOWED_ORIGINS = env.list("CORS_ALLOWED_ORIGINS", default=["http://localhost:3000"])
 
 # --- Third-party integration keys (set in .env, never committed) --------
-GEMINI_API_KEY = env("GEMINI_API_KEY", default="")
+# Prefer GOOGLE_AI_API_KEY; GEMINI_API_KEY kept as alias for older .env files.
+GOOGLE_AI_API_KEY = env("GOOGLE_AI_API_KEY", default="") or env("GEMINI_API_KEY", default="")
+GEMINI_API_KEY = GOOGLE_AI_API_KEY
 GOOGLE_OAUTH_CLIENT_ID = env("GOOGLE_OAUTH_CLIENT_ID", default="")
 
 # DB indices 2/3, not 0/1 -- those are already inzufinder's local broker/
