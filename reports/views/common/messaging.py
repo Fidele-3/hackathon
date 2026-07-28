@@ -1,3 +1,5 @@
+import logging
+
 from django.db.models import Q
 from rest_framework import generics, status
 from rest_framework.exceptions import PermissionDenied
@@ -5,7 +7,11 @@ from rest_framework.generics import get_object_or_404
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 
+from ai.gemini_client import CHAT_MODEL, GeminiError, generate_content
+from ai.models import AIQueryLog
 from reports.models import Conversation, Message, MessageAttachment
+from reports.serializers.common.escalation import EscalateConversationSerializer
+from reports.serializers.common.issue import FarmerIssueSerializer
 from reports.serializers.common.messaging import (
     ConversationSerializer,
     MessageSerializer,
@@ -13,6 +19,44 @@ from reports.serializers.common.messaging import (
     StartConversationSerializer,
 )
 from reports.tasks import process_chat_attachment_video_task
+
+logger = logging.getLogger(__name__)
+
+
+def _generate_ai_reply(conversation, farmer, body, attachment_file):
+    image_bytes = None
+    image_mime_type = None
+    is_image = attachment_file and (getattr(attachment_file, "content_type", "") or "").startswith("image")
+    if is_image:
+        image_mime_type = attachment_file.content_type
+        attachment_file.seek(0)
+        image_bytes = attachment_file.read()
+        attachment_file.seek(0)
+
+    query_type = AIQueryLog.QUERY_CROP_DIAGNOSIS if is_image else AIQueryLog.QUERY_GENERAL_QA
+
+    try:
+        response_text = generate_content(CHAT_MODEL, body, image_bytes=image_bytes, image_mime_type=image_mime_type)
+    except GeminiError:
+        logger.exception("Gemini call failed for conversation %s", conversation.pk)
+        response_text = ""
+
+    log = AIQueryLog.objects.create(
+        user=farmer,
+        query_type=query_type,
+        model_used=CHAT_MODEL,
+        input_text=body,
+        response_text=response_text,
+        input_image=attachment_file if is_image else None,
+    )
+
+    reply_body = response_text or (
+        "The assistant couldn't process this right now. You can try again, or escalate this "
+        "conversation to your cell officer."
+    )
+    return Message.objects.create(
+        conversation=conversation, sender=None, is_ai_message=True, body=reply_body, ai_query=log
+    )
 
 
 class ConversationListCreateView(generics.GenericAPIView):
@@ -77,4 +121,35 @@ class MessageListCreateView(generics.GenericAPIView):
                 process_chat_attachment_video_task.delay(attachment.id)
 
         conversation.save(update_fields=["updated_at"])
-        return Response(MessageSerializer(message).data, status=status.HTTP_201_CREATED)
+
+        response_messages = [message]
+        if conversation.channel == Conversation.CHANNEL_AI:
+            ai_message = _generate_ai_reply(
+                conversation, request.user, serializer.validated_data.get("body", ""), attachment_file
+            )
+            response_messages.append(ai_message)
+            conversation.save(update_fields=["updated_at"])
+
+        return Response(MessageSerializer(response_messages, many=True).data, status=status.HTTP_201_CREATED)
+
+
+class EscalateConversationView(generics.GenericAPIView):
+    permission_classes = [IsAuthenticated]
+    serializer_class = EscalateConversationSerializer
+
+    def post(self, request, public_id):
+        conversation = get_object_or_404(Conversation, public_id=public_id, farmer=request.user)
+        if conversation.channel != Conversation.CHANNEL_AI:
+            raise PermissionDenied("Only an AI conversation can be escalated.")
+
+        serializer = self.get_serializer(data=request.data, context={"conversation": conversation})
+        serializer.is_valid(raise_exception=True)
+        issue, officer_conversation = serializer.save()
+
+        return Response(
+            {
+                "issue": FarmerIssueSerializer(issue).data,
+                "officer_conversation": ConversationSerializer(officer_conversation).data,
+            },
+            status=status.HTTP_201_CREATED,
+        )

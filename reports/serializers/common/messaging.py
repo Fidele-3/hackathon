@@ -1,13 +1,8 @@
 from rest_framework import serializers
 
 from reports.models import Conversation, FarmerIssue, Message, MessageAttachment
-from users.models import OfficerProfile
+from reports.routing import find_cell_officer
 from users.serializers.common.profile import MeSerializer
-
-CATEGORY_TO_SPECIALIZATION = {
-    FarmerIssue.CATEGORY_CROP: OfficerProfile.SPECIALIZATION_AGRONOMIST,
-    FarmerIssue.CATEGORY_LIVESTOCK: OfficerProfile.SPECIALIZATION_VETERINARY,
-}
 
 
 class MessageAttachmentSerializer(serializers.ModelSerializer):
@@ -71,16 +66,11 @@ class StartConversationSerializer(serializers.Serializer):
             raise serializers.ValidationError(
                 "Register a village on your profile before messaging your cell officer."
             )
-        specialization = CATEGORY_TO_SPECIALIZATION[validated_data["category"]]
-        officer_profile = OfficerProfile.objects.filter(
-            level=OfficerProfile.LEVEL_CELL,
-            managed_cell=farmer.village.cell,
-            specialization=specialization,
-            is_active=True,
-        ).first()
+        category = validated_data["category"]
+        officer_profile = find_cell_officer(farmer.village.cell, category)
         if not officer_profile:
             raise serializers.ValidationError(
-                f"No {specialization} officer is currently assigned to your cell."
+                f"No officer covering '{category}' issues is currently assigned to your cell."
             )
 
         conversation, _ = Conversation.objects.get_or_create(
