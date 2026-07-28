@@ -1,7 +1,7 @@
 from django.conf import settings
 from django.db import models
 
-from ai.media_paths import ai_query_image_upload_to
+from ai.media_paths import ai_query_audio_upload_to, ai_query_image_upload_to
 
 
 class AIQueryLog(models.Model):
@@ -9,11 +9,13 @@ class AIQueryLog(models.Model):
     QUERY_LIVESTOCK_QUERY = "livestock_query"
     QUERY_GENERAL_QA = "general_qa"
     QUERY_INSIGHT_GENERATION = "insight_generation"
+    QUERY_VOICE_MESSAGE = "voice_message"
     QUERY_TYPE_CHOICES = [
         (QUERY_CROP_DIAGNOSIS, "Crop disease diagnosis"),
         (QUERY_LIVESTOCK_QUERY, "Livestock query"),
         (QUERY_GENERAL_QA, "General farming Q&A"),
         (QUERY_INSIGHT_GENERATION, "Aggregate insight generation"),
+        (QUERY_VOICE_MESSAGE, "Voice message"),
     ]
 
     user = models.ForeignKey(
@@ -24,6 +26,7 @@ class AIQueryLog(models.Model):
 
     input_text = models.TextField(blank=True)
     input_image = models.ImageField(upload_to=ai_query_image_upload_to, null=True, blank=True)
+    input_audio = models.FileField(upload_to=ai_query_audio_upload_to, null=True, blank=True)
 
     response_text = models.TextField(blank=True)
     # Null when the model itself didn't report a confidence -- never backfilled.

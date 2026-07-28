@@ -21,6 +21,10 @@ def ai_query_image_upload_to(instance, filename):
     return generate_path("ai_query_images", filename)
 
 
+def ai_query_audio_upload_to(instance, filename):
+    return generate_path("ai_query_audio", filename)
+
+
 def chat_attachment_upload_to(instance, filename):
     return generate_path("chat_attachments", filename)
 

@@ -24,19 +24,36 @@ logger = logging.getLogger(__name__)
 
 
 def _generate_ai_reply(conversation, farmer, body, attachment_file):
-    image_bytes = None
-    image_mime_type = None
-    is_image = attachment_file and (getattr(attachment_file, "content_type", "") or "").startswith("image")
+    content_type = (getattr(attachment_file, "content_type", "") or "") if attachment_file else ""
+    is_image = content_type.startswith("image")
+    is_audio = content_type.startswith("audio")
+
+    image_bytes = image_mime_type = None
+    audio_bytes = audio_mime_type = None
     if is_image:
-        image_mime_type = attachment_file.content_type
+        image_mime_type = content_type
         attachment_file.seek(0)
         image_bytes = attachment_file.read()
         attachment_file.seek(0)
+    elif is_audio:
+        audio_mime_type = content_type
+        attachment_file.seek(0)
+        audio_bytes = attachment_file.read()
+        attachment_file.seek(0)
 
-    query_type = AIQueryLog.QUERY_CROP_DIAGNOSIS if is_image else AIQueryLog.QUERY_GENERAL_QA
+    if is_image:
+        query_type = AIQueryLog.QUERY_CROP_DIAGNOSIS
+    elif is_audio:
+        query_type = AIQueryLog.QUERY_VOICE_MESSAGE
+    else:
+        query_type = AIQueryLog.QUERY_GENERAL_QA
 
     try:
-        response_text = generate_content(CHAT_MODEL, body, image_bytes=image_bytes, image_mime_type=image_mime_type)
+        response_text = generate_content(
+            CHAT_MODEL, body,
+            image_bytes=image_bytes, image_mime_type=image_mime_type,
+            audio_bytes=audio_bytes, audio_mime_type=audio_mime_type,
+        )
     except GeminiError:
         logger.exception("Gemini call failed for conversation %s", conversation.pk)
         response_text = ""
@@ -48,6 +65,7 @@ def _generate_ai_reply(conversation, farmer, body, attachment_file):
         input_text=body,
         response_text=response_text,
         input_image=attachment_file if is_image else None,
+        input_audio=attachment_file if is_audio else None,
     )
 
     reply_body = response_text or (
