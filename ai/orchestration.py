@@ -175,6 +175,47 @@ def chat_reply(
     return generate_content(model, prompt)
 
 
+def run_field_scan(
+    *,
+    user,
+    text: str = "",
+    video_bytes: bytes | None = None,
+    video_mime_type: str | None = None,
+    frame_images: list[tuple[bytes, str]] | None = None,
+    language: Language = "en",
+    nano_hint: dict | None = None,
+) -> dict[str, Any]:
+    """Field walk video intelligence (Gemini frames/video)."""
+    from ai.agents.field_scan import run_field_scan_agent
+
+    if not video_bytes and not frame_images:
+        raise ValueError("Provide a field video or sampled frames.")
+
+    # Phone videos are large — frames-first is the production path.
+    report = run_field_scan_agent(
+        text=text,
+        video_bytes=video_bytes,
+        video_mime_type=video_mime_type,
+        frame_images=frame_images,
+        language=language,
+        nano_hint=nano_hint,
+    )
+
+    model = resolve_model(AITask.FIELD_VIDEO)
+    log = AIQueryLog.objects.create(
+        user=user,
+        query_type=AIQueryLog.QUERY_CROP_DIAGNOSIS,
+        model_used=model,
+        input_text=text or "field video scan",
+        response_text=report.get("summary") or report.get("recommendation") or "",
+        confidence_score=report.get("confidence"),
+        structured_response={**report, "kind": "field_scan"},
+        severity=report.get("severity") or "",
+        language=language,
+    )
+    return {"scan_id": log.pk, "report": report, "nano_verified": bool(nano_hint)}
+
+
 def officer_priority_feed(*, officer, limit: int = 30) -> list[dict[str, Any]]:
     """Urgent AI-escalated cases for the officer command center."""
     from reports.models import FarmerIssue
@@ -199,7 +240,7 @@ def officer_priority_feed(*, officer, limit: int = 30) -> list[dict[str, Any]]:
         feed.append({
             "issue_id": issue.pk,
             "status": issue.status,
-            "urgent": severity == "high",
+            "urgent": severity == "high" or bool(structured.get("kind") == "field_scan" and severity != "low"),
             "problem": structured.get("problem") or issue.description[:120],
             "crop": structured.get("crop") or "",
             "severity": severity,
@@ -222,11 +263,11 @@ def officer_priority_feed(*, officer, limit: int = 30) -> list[dict[str, Any]]:
     return feed
 
 
-# Silence unused import lint if GeminiError re-exported for views
 __all__ = [
     "GeminiError",
     "EscalationError",
     "run_crop_diagnosis",
+    "run_field_scan",
     "escalate_diagnosis",
     "transcribe_audio",
     "chat_reply",

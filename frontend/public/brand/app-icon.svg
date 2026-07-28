@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
+  <rect width="512" height="512" rx="108" fill="#FFFFFF"/>
+  <!-- circular stroke with break at bottom-left -->
+  <circle cx="256" cy="256" r="168" fill="none" stroke="#1B5E20" stroke-width="14" stroke-linecap="round" stroke-dasharray="980 120" stroke-dashoffset="80"/>
+  <!-- leaf -->
+  <path d="M256 120 C340 150 390 230 360 310 C330 380 250 400 200 360 C150 320 160 220 256 120 Z" fill="url(#leafGrad)"/>
+  <!-- circuit line -->
+  <path d="M230 210 L290 280" stroke="#FFFFFF" stroke-width="14" stroke-linecap="round"/>
+  <circle cx="230" cy="210" r="12" fill="#FFFFFF"/>
+  <circle cx="260" cy="245" r="9" fill="#FFFFFF"/>
+  <circle cx="290" cy="280" r="12" fill="#FFFFFF"/>
+  <defs>
+    <linearGradient id="leafGrad" x1="200" y1="120" x2="340" y2="380" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#7CB342"/>
+      <stop offset="0.45" stop-color="#43A047"/>
+      <stop offset="1" stop-color="#1B5E20"/>
+    </linearGradient>
+  </defs>
+</svg>

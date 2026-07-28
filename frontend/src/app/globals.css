@@ -4,44 +4,81 @@
 
 :root {
   --m3-primary: #2e7d32;
+  --m3-primary-dark: #1b5e20;
+  --m3-accent: #7cb342;
   --m3-surface: #f7faf6;
   --m3-on: #1b1c1a;
+  --safe-top: env(safe-area-inset-top, 0px);
+  --safe-bottom: env(safe-area-inset-bottom, 0px);
 }
 
 html,
 body {
   min-height: 100%;
+  min-height: 100dvh;
+  overscroll-behavior-y: none;
 }
 
 body {
   color: var(--m3-on);
   background:
     radial-gradient(ellipse 100% 70% at 0% 0%, #c8e6c9 0%, transparent 50%),
-    radial-gradient(ellipse 80% 50% at 100% 0%, rgba(66, 133, 244, 0.12) 0%, transparent 45%),
-    linear-gradient(180deg, #f7faf6 0%, #eef5ee 100%);
+    radial-gradient(ellipse 80% 50% at 100% 0%, rgba(66, 133, 244, 0.08) 0%, transparent 45%),
+    linear-gradient(180deg, #ffffff 0%, #f7faf6 40%, #eef5ee 100%);
   -webkit-font-smoothing: antialiased;
+  -webkit-user-select: none;
+  user-select: none;
+  touch-action: manipulation;
+}
+
+/* Allow selecting chat text */
+.selectable,
+input,
+textarea {
+  -webkit-user-select: text;
+  user-select: text;
 }
 
 * {
   -webkit-tap-highlight-color: transparent;
 }
 
-.glass {
-  background: rgba(255, 255, 255, 0.72);
-  backdrop-filter: blur(18px);
-  -webkit-backdrop-filter: blur(18px);
-  border: 1px solid rgba(255, 255, 255, 0.55);
+.app-shell {
+  padding-top: var(--safe-top);
+  min-height: 100dvh;
+}
+
+.pb-tabbar {
+  padding-bottom: calc(5.5rem + var(--safe-bottom));
 }
 
 .gemini-ring {
   background: conic-gradient(from 0deg, #4285f4, #ea4335, #fbbc04, #34a853, #4285f4);
 }
 
+.glass {
+  background: rgba(255, 255, 255, 0.82);
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
+  border: 1px solid rgba(255, 255, 255, 0.55);
+}
+
+@keyframes shimmer {
+  0% { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
+
 .shimmer-text {
-  background: linear-gradient(90deg, #2e7d32 0%, #4285f4 40%, #34a853 70%, #2e7d32 100%);
+  background: linear-gradient(90deg, #2e7d32, #4285f4, #34a853, #2e7d32);
   background-size: 200% 100%;
   -webkit-background-clip: text;
   background-clip: text;
   color: transparent;
   animation: shimmer 2s linear infinite;
+}
+
+@media (display-mode: standalone) {
+  body {
+    background: #f7faf6;
+  }
 }

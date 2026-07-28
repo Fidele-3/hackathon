@@ -1,4 +1,4 @@
-import type { AuthUser, CropScanResponse, Language, PriorityAlert } from "./types";
+import type { AuthUser, CropScanResponse, FieldScanResponse, Language, PriorityAlert } from "./types";
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000/api/v1";
 
@@ -45,7 +45,13 @@ async function api<T>(path: string, options: RequestInit = {}): Promise<T> {
   const res = await fetch(`${API_URL}${path}`, { ...options, headers });
   const data = await res.json().catch(() => ({}));
   if (!res.ok) {
-    throw new Error(data.detail || data.message || `Request failed (${res.status})`);
+    const detail =
+      typeof data.detail === "string"
+        ? data.detail
+        : Array.isArray(data.detail)
+          ? data.detail.map((d: { msg?: string }) => d.msg || JSON.stringify(d)).join(", ")
+          : data.message || `Request failed (${res.status})`;
+    throw new Error(detail);
   }
   return data as T;
 }
@@ -74,6 +80,22 @@ export async function cropScan(params: {
   form.append("auto_escalate", String(params.autoEscalate ?? true));
   if (params.landId) form.append("land_id", String(params.landId));
   return api<CropScanResponse>("/ai/crop-scan/", { method: "POST", body: form });
+}
+
+export async function fieldScan(params: {
+  video?: File | Blob | null;
+  frames?: Blob[];
+  text?: string;
+  language: Language;
+  nanoHint?: Record<string, unknown>;
+}) {
+  const form = new FormData();
+  if (params.video) form.append("video", params.video, "field.webm");
+  (params.frames || []).forEach((frame, i) => form.append(`frame${i}`, frame, `frame${i}.jpg`));
+  if (params.text) form.append("text", params.text);
+  form.append("language", params.language);
+  if (params.nanoHint) form.append("nano_hint", JSON.stringify(params.nanoHint));
+  return api<FieldScanResponse>("/ai/field-scan/", { method: "POST", body: form });
 }
 
 export async function escalateDiagnosis(diagnosisId: number, landId?: number) {

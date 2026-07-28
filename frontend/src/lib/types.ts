@@ -44,3 +44,37 @@ export type AuthUser = {
   full_name: string;
   user_level: string;
 };
+
+export type FieldHotspot = {
+  label: string;
+  x: number;
+  y: number;
+  intensity: number;
+};
+
+export type FieldCrop = {
+  name: string;
+  location: string;
+  health: string;
+};
+
+export type FieldReport = {
+  crop: string;
+  problem: string;
+  confidence: number;
+  severity: string;
+  area_affected_pct: number;
+  disease_spreading: string;
+  hotspots: FieldHotspot[];
+  crops_located: FieldCrop[];
+  recommendation: string;
+  summary: string;
+  language: Language;
+  engine?: string;
+};
+
+export type FieldScanResponse = {
+  scan_id: number;
+  report: FieldReport;
+  nano_verified: boolean;
+};

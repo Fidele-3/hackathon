@@ -18,6 +18,31 @@ Model Router → Gemini (vision / chat / voice)
 
 UI never calls Google AI directly. Keys live in `.env` only (`GOOGLE_AI_API_KEY`).
 
+## PostgreSQL setup
+
+1. Create a free Postgres DB (Neon, Supabase, Railway, or Render).
+2. Copy the connection string into `.env`:
+
+```bash
+DATABASE_URL=postgresql://USER:PASSWORD@HOST:5432/DBNAME?sslmode=require
+```
+
+3. Run:
+
+```bash
+./scripts/setup_db.sh
+# or:
+python manage.py migrate
+python manage.py seed_demo
+```
+
+SQLite (`sqlite:///db.sqlite3`) works for local-only demos; use Postgres for the hackathon deploy.
+
+## Phone video field scan
+
+Phone uploads sample **5 frames on-device (Nano Banana)**, then Gemini analyzes those frames.
+Full video is only uploaded if under 8 MB. Upload limit is **50 MB**.
+
 ## Quick start
 
 ### 1. Backend
@@ -55,13 +80,12 @@ Officer: Alice Uwase · cell agronomist
 
 ## Judge demo script (40 seconds)
 
-1. Open http://localhost:3000 → login as Farmer (`+250788000001` / `demo1234`)
-2. Keep **Demo ON** (yellow chip) for a guaranteed smooth path
+1. Open http://localhost:3000 → **Enter as Farmer** → login (`+250788000001` / `demo1234`)
+2. Keep **Demo ON** for a guaranteed smooth path
 3. See **Muraho Jean** + Farm Health Score 98%
-4. Tap **Diagnose My Crop** → sample leaf ready → **Analyze with Gemini**
-5. Watch Google-color thinking steps → diagnosis glass card + voice
-6. Tap **Escalate to Officer** → success animation
-7. Logout → Officer (`+250788000010`) → **URGENT AI ALERT** on priority feed (auto-refreshes)
+4. Tap **Diagnose My Crop** → Analyze → escalate
+5. Or **Field Video Sweep** → Nano Banana → Gemini locate crops + heatmap
+6. Logout → portal → **Enter as Officer** (`+250788000010`) → priority feed
 
 Optional wow: glowing FAB → WhatsApp-style chat → voice / photo messages with streaming replies.
 
@@ -70,6 +94,7 @@ Optional wow: glowing FAB → WhatsApp-style chat → voice / photo messages wit
 | Method | Path | Purpose |
 |--------|------|---------|
 | POST | `/api/v1/ai/crop-scan/` | Multimodal crop diagnosis |
+| POST | `/api/v1/ai/field-scan/` | Field video / frames sweep |
 | POST | `/api/v1/ai/escalate/` | Create expert case |
 | POST | `/api/v1/ai/voice/transcribe/` | Speech → text |
 | POST | `/api/v1/ai/voice/speak/` | TTS hint (browser playback) |

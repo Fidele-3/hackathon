@@ -35,6 +35,7 @@ def _generate_ai_reply(conversation, farmer, body, attachment_file):
         attachment_file.seek(0)
 
     query_type = AIQueryLog.QUERY_CROP_DIAGNOSIS if is_image else AIQueryLog.QUERY_GENERAL_QA
+    log = None
 
     try:
         from ai.model_router import CHAT_MODEL
@@ -64,6 +65,10 @@ def _generate_ai_reply(conversation, farmer, body, attachment_file):
             )
     except GeminiError:
         logger.exception("Gemini call failed for conversation %s", conversation.pk)
+    except Exception:
+        logger.exception("Unexpected AI error for conversation %s", conversation.pk)
+
+    if log is None:
         response_text = ""
         log = AIQueryLog.objects.create(
             user=farmer,

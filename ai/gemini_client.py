@@ -18,6 +18,13 @@ GEMINI_API_BASE = "https://generativelanguage.googleapis.com/v1beta"
 # Re-export for callers that still import from this module.
 from ai.model_router import CHAT_MODEL, INSIGHT_MODEL, VISION_MODEL  # noqa: E402
 
+# Network-level exceptions that indicate the API is unreachable (not an API error).
+_NETWORK_ERRORS = (
+    requests.exceptions.ConnectionError,
+    requests.exceptions.Timeout,
+    requests.exceptions.TooManyRedirects,
+)
+
 SYSTEM_INSTRUCTION = (
     "You are e-Hinga AI, an agricultural extension expert for smallholder farmers in Rwanda. "
     "When given a photo, identify the likely crop disease or livestock health issue and "
@@ -46,13 +53,30 @@ def _build_contents(
     image_mime_type: str | None = None,
     audio_bytes: bytes | None = None,
     audio_mime_type: str | None = None,
+    video_bytes: bytes | None = None,
+    video_mime_type: str | None = None,
+    extra_images: list[tuple[bytes, str]] | None = None,
 ) -> list[dict[str, Any]]:
     parts: list[dict[str, Any]] = []
+    if video_bytes:
+        parts.append({
+            "inline_data": {
+                "mime_type": video_mime_type or "video/mp4",
+                "data": base64.b64encode(video_bytes).decode("ascii"),
+            }
+        })
     if image_bytes:
         parts.append({
             "inline_data": {
                 "mime_type": image_mime_type or "image/jpeg",
                 "data": base64.b64encode(image_bytes).decode("ascii"),
+            }
+        })
+    for img, mime in extra_images or []:
+        parts.append({
+            "inline_data": {
+                "mime_type": mime or "image/jpeg",
+                "data": base64.b64encode(img).decode("ascii"),
             }
         })
     if audio_bytes:
@@ -73,6 +97,9 @@ def generate_content(
     image_mime_type: str | None = None,
     audio_bytes: bytes | None = None,
     audio_mime_type: str | None = None,
+    video_bytes: bytes | None = None,
+    video_mime_type: str | None = None,
+    extra_images: list[tuple[bytes, str]] | None = None,
     system_instruction: str | None = None,
     timeout: int = 60,
 ) -> str:
@@ -84,13 +111,26 @@ def generate_content(
             image_mime_type=image_mime_type,
             audio_bytes=audio_bytes,
             audio_mime_type=audio_mime_type,
+            video_bytes=video_bytes,
+            video_mime_type=video_mime_type,
+            extra_images=extra_images,
         ),
         "systemInstruction": {"parts": [{"text": system_instruction or SYSTEM_INSTRUCTION}]},
         "generationConfig": {"temperature": 0.2},
     }
-    response = requests.post(url, params={"key": _api_key()}, json=payload, timeout=timeout)
-    if response.status_code != 200:
-        raise GeminiError(f"Gemini API error {response.status_code}: {response.text[:500]}")
+    try:
+        response = requests.post(url, params={"key": _api_key()}, json=payload, timeout=timeout)
+        response.raise_for_status()
+    except _NETWORK_ERRORS as exc:
+        raise GeminiError(
+            "The AI service is currently unreachable. Check your internet connection and try again."
+        ) from exc
+    except requests.exceptions.HTTPError as exc:
+        status_code = exc.response.status_code if exc.response is not None else 0
+        detail = exc.response.text[:500] if exc.response is not None else str(exc)
+        raise GeminiError(f"Gemini API error {status_code}: {detail}") from exc
+    except requests.exceptions.RequestException as exc:
+        raise GeminiError(f"Gemini request failed: {exc}") from exc
 
     data = response.json()
     candidates = data.get("candidates") or []
