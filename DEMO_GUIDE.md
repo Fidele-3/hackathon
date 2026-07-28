@@ -10,7 +10,7 @@ bash scripts/setup_db.sh          # migrate + seed demo users
 python manage.py runserver 0.0.0.0:8000
 
 # 2. Frontend
-cd frontend
+cd citizen-frontend
 cp .env.local.example .env.local  # Set NEXT_PUBLIC_API_URL=http://localhost:8000
 npm install
 npm run dev                       # opens at http://localhost:3000

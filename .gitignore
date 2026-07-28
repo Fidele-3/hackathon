@@ -9,6 +9,14 @@ media/
 staticfiles/
 *.log
 .DS_Store
+# Citizen frontend
+citizen-frontend/node_modules/
+citizen-frontend/.next/
+citizen-frontend/out/
+citizen-frontend/.env.local
+citizen-frontend/tsconfig.tsbuildinfo
+citizen-frontend/ios/
+# Legacy path (if present)
 frontend/node_modules/
 frontend/.next/
 frontend/.env.local

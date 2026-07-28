@@ -60,7 +60,7 @@ python manage.py runserver
 ### 2. Frontend
 
 ```bash
-cd frontend
+cd citizen-frontend
 cp .env.local.example .env.local
 npm install
 npm run dev

@@ -4,7 +4,7 @@ Pixel-style PWA. **No backend required.**
 
 ## Run on iPhone
 
-1. `cd frontend && npm install && npm run dev`
+1. `cd citizen-frontend && npm install && npm run dev`
 2. Open the LAN URL on your iPhone (same Wi‑Fi)
 3. Safari → **Share** → **Add to Home Screen**
 4. Launch **E-Hinga** — splash + standalone app chrome
