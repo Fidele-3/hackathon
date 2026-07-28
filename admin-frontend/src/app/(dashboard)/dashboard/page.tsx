@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
+import { ArrowRight, Map as MapIcon } from "lucide-react";
 import { Bar, BarChart, CartesianGrid, Cell, Legend, Pie, PieChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
 import { api, ApiError } from "@/lib/api";
 import { useAuthStore } from "@/lib/auth-store";
@@ -146,7 +147,10 @@ export default function DashboardPage() {
               View every farmer-reported issue plotted on the map, filterable by layer, with AI analysis.
             </p>
           </div>
-          <span className="text-2xl">🗺️ →</span>
+          <div className="flex items-center gap-2 text-emerald-700 dark:text-emerald-400">
+            <MapIcon size={22} />
+            <ArrowRight size={18} />
+          </div>
         </Card>
       </Link>
 

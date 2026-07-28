@@ -1,6 +1,7 @@
 "use client";
 
 import { FormEvent, useState } from "react";
+import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { api, ApiError } from "@/lib/api";
 import { useAuthStore } from "@/lib/auth-store";
@@ -39,11 +40,8 @@ export default function LoginPage() {
   return (
     <div className="flex min-h-screen items-center justify-center bg-neutral-50 dark:bg-neutral-900">
       <div className="w-full max-w-sm rounded-lg border border-neutral-200 bg-white p-8 shadow-sm dark:border-neutral-800 dark:bg-neutral-950">
-        <h1 className="text-xl font-bold">
-          <span className="text-emerald-700 dark:text-emerald-400">E-</span>
-          <span className="text-amber-500 dark:text-amber-400">Hinga</span>
-        </h1>
-        <p className="mb-6 mt-1 text-sm text-neutral-500">Officer &amp; admin console</p>
+        <Image src="/logo.png" alt="E-Hinga" width={180} height={48} className="h-12 w-auto object-contain" priority />
+        <p className="mb-6 mt-2 text-sm text-neutral-500">Officer &amp; admin console</p>
 
         {error && <ErrorBanner message={error} />}
 

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import Image from "next/image";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import {
@@ -17,7 +17,6 @@ import {
   Sparkles,
   TrendingUp,
   LogOut,
-  Brain,
   Map as MapIcon,
   Bot,
 } from "lucide-react";
@@ -142,8 +141,10 @@ export function AppShell({ children }: { children: React.ReactNode }) {
         </div>
 
         <div className="relative z-10 border-b border-emerald-500/30 px-5 py-4">
-          <span className="text-lg font-semibold text-white">E-Hinga</span>
-          <p className="text-xs text-emerald-300">Officer Console</p>
+          <div className="inline-block rounded-md bg-white px-2 py-1">
+            <Image src="/logo.png" alt="E-Hinga" width={140} height={38} className="h-8 w-auto object-contain" priority />
+          </div>
+          <p className="mt-1 text-xs text-emerald-300">Officer Console</p>
         </div>
         <nav className="relative z-10 flex-1 space-y-1 overflow-y-auto p-3">
           <div className="mb-3 truncate rounded-lg border border-emerald-400/40 bg-emerald-600/40 px-3 py-2 text-sm font-semibold uppercase tracking-wider text-emerald-200 backdrop-blur-sm">
@@ -189,24 +190,13 @@ export function AppShell({ children }: { children: React.ReactNode }) {
 }
 
 function FloatingAIButton() {
-  const [hovered, setHovered] = useState(false);
-
   return (
-    <div className="fixed bottom-8 right-8 z-50">
-      {hovered && (
-        <div className="mb-2 px-4 py-2 bg-emerald-700 text-white rounded-xl shadow-lg text-sm font-medium fade-in-top">
-          Ask E-Hinga AI
-        </div>
-      )}
-      <Link
-        href="/ai-assistant"
-        onMouseEnter={() => setHovered(true)}
-        onMouseLeave={() => setHovered(false)}
-        className="flex h-16 w-16 items-center justify-center rounded-2xl bg-gradient-to-br from-emerald-600 to-emerald-500 shadow-xl border border-emerald-400 transition-all duration-300 hover:scale-105 hover:from-emerald-500 hover:to-emerald-400"
-        title="AI Assistant"
-      >
-        <Brain className="h-8 w-8 text-white" />
-      </Link>
-    </div>
+    <Link
+      href="/ai-assistant"
+      title="Ask E-Hinga AI"
+      className="fixed bottom-8 right-8 z-50 flex h-16 w-16 items-center justify-center rounded-full bg-white shadow-xl border-2 border-emerald-500 hover:shadow-2xl"
+    >
+      <Image src="/logo.png" alt="E-Hinga AI" width={44} height={44} className="h-11 w-11 object-contain" />
+    </Link>
   );
 }
