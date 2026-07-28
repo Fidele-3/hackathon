@@ -1,4 +1,5 @@
 from .catalog import Crop, Fertilizer, LivestockType
+from .climate import CellClimateData
 from .harvest import HarvestReport
 from .land import Land
 from .listing import HarvestListing
@@ -19,4 +20,5 @@ __all__ = [
     "WarehouseCapacity",
     "StorageRequest",
     "HarvestListing",
+    "CellClimateData",
 ]

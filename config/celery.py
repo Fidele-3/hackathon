@@ -14,4 +14,12 @@ app.conf.beat_schedule = {
         "task": "ai.tasks.generate_daily_insights_task",
         "schedule": crontab(hour=22, minute=0),
     },
+    "fetch_24h_forecast_hourly": {
+        "task": "production.tasks.fetch_24h_forecast_task",
+        "schedule": crontab(minute=0),
+    },
+    "fetch_past_3months_weekly": {
+        "task": "production.tasks.fetch_past_3months_task",
+        "schedule": crontab(minute=0, hour=1, day_of_week="mon"),
+    },
 }

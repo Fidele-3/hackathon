@@ -1,9 +1,9 @@
 from django.contrib import admin
 
 from .models import (
-    Crop, Fertilizer, HarvestListing, HarvestReport, Land, LivestockLocation,
-    LivestockProduction, LivestockType, ResourceRequest, StorageRequest,
-    Warehouse, WarehouseCapacity,
+    CellClimateData, Crop, Fertilizer, HarvestListing, HarvestReport, Land,
+    LivestockLocation, LivestockProduction, LivestockType, ResourceRequest,
+    StorageRequest, Warehouse, WarehouseCapacity,
 )
 
 admin.site.register(Crop)
@@ -37,3 +37,8 @@ class StorageRequestAdmin(admin.ModelAdmin):
 class HarvestListingAdmin(admin.ModelAdmin):
     list_display = ("id", "farmer", "quantity_available_kg", "price_per_kg", "status")
     list_filter = ("status",)
+
+
+@admin.register(CellClimateData)
+class CellClimateDataAdmin(admin.ModelAdmin):
+    list_display = ("cell", "forecast_fetched_at", "historical_fetched_at")
