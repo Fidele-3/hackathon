@@ -1,6 +1,7 @@
 from django.urls import path
 
 from .views.buyer.listing import BuyerListingListView, ReserveListingView
+from .views.common.catalog import CropListView, FertilizerListView, LivestockTypeListView
 from .views.citizen.harvest import HarvestReportListCreateView
 from .views.citizen.land import LandListCreateView
 from .views.citizen.listing import HarvestListingListCreateView
@@ -24,6 +25,9 @@ urlpatterns = [
     path("resource-requests/", ResourceRequestListCreateView.as_view(), name="resource-request-list-create"),
     path("storage-requests/", StorageRequestListCreateView.as_view(), name="storage-request-list-create"),
     path("listings/", HarvestListingListCreateView.as_view(), name="listing-list-create"),
+    path("catalog/crops/", CropListView.as_view(), name="catalog-crops"),
+    path("catalog/livestock-types/", LivestockTypeListView.as_view(), name="catalog-livestock-types"),
+    path("catalog/fertilizers/", FertilizerListView.as_view(), name="catalog-fertilizers"),
     path("officer/lands/", OfficerLandListView.as_view(), name="officer-land-list"),
     path("officer/harvest-reports/", OfficerHarvestReportListView.as_view(), name="officer-harvest-report-list"),
     path("officer/livestock-locations/", OfficerLivestockLocationListView.as_view(), name="officer-livestock-location-list"),

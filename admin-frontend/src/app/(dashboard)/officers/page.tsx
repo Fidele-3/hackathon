@@ -5,6 +5,7 @@ import { useAuthStore } from "@/lib/auth-store";
 import { api, ApiError } from "@/lib/api";
 import { useList } from "@/lib/hooks";
 import { Button, Card, DataTable, EmptyState, ErrorBanner, PageHeader, Spinner } from "@/components/ui";
+import { LocationPicker } from "@/components/LocationPicker";
 import type { Me, OfficerLevel, OfficerRoster, Specialization } from "@/lib/types";
 
 interface LevelConfig {
@@ -14,6 +15,7 @@ interface LevelConfig {
   createPath: string;
   jurisdictionField: "managed_district" | "managed_sector" | "managed_cell";
   jurisdictionLabel: string;
+  pickerStopAt: "district" | "sector" | "cell";
   rosterLevel: OfficerLevel;
 }
 
@@ -24,7 +26,8 @@ const CONFIG_BY_LEVEL: Record<string, LevelConfig> = {
     listPath: "/auth/officers/district/list/",
     createPath: "/auth/officers/district/",
     jurisdictionField: "managed_district",
-    jurisdictionLabel: "Managed district ID",
+    jurisdictionLabel: "Managed district",
+    pickerStopAt: "district",
     rosterLevel: "district",
   },
   district_officer: {
@@ -33,7 +36,8 @@ const CONFIG_BY_LEVEL: Record<string, LevelConfig> = {
     listPath: "/auth/officers/sector/list/",
     createPath: "/auth/officers/sector/",
     jurisdictionField: "managed_sector",
-    jurisdictionLabel: "Managed sector ID",
+    jurisdictionLabel: "Managed sector",
+    pickerStopAt: "sector",
     rosterLevel: "sector",
   },
   sector_officer: {
@@ -42,7 +46,8 @@ const CONFIG_BY_LEVEL: Record<string, LevelConfig> = {
     listPath: "/auth/officers/cell/list/",
     createPath: "/auth/officers/cell/",
     jurisdictionField: "managed_cell",
-    jurisdictionLabel: "Managed cell ID",
+    jurisdictionLabel: "Managed cell",
+    pickerStopAt: "cell",
     rosterLevel: "cell",
   },
 };
@@ -68,7 +73,7 @@ export default function OfficersPage() {
   const [fullName, setFullName] = useState("");
   const [email, setEmail] = useState("");
   const [workEmail, setWorkEmail] = useState("");
-  const [jurisdictionId, setJurisdictionId] = useState("");
+  const [jurisdictionId, setJurisdictionId] = useState<number | null>(null);
   const [specialization, setSpecialization] = useState<Specialization>("agronomist");
 
   if (!config) {
@@ -77,6 +82,10 @@ export default function OfficersPage() {
 
   const handleCreate = async (e: FormEvent) => {
     e.preventDefault();
+    if (!jurisdictionId) {
+      setFormError(`Select the ${config.jurisdictionLabel.toLowerCase()} this officer will manage.`);
+      return;
+    }
     setFormError(null);
     setSubmitting(true);
     try {
@@ -87,7 +96,7 @@ export default function OfficersPage() {
         email: email || undefined,
         work_email: workEmail || undefined,
         specialization,
-        [config.jurisdictionField]: Number(jurisdictionId),
+        [config.jurisdictionField]: jurisdictionId,
       };
       const data = await api.post<CreateResponse>(config.createPath, payload);
       setCredentials(data);
@@ -97,7 +106,7 @@ export default function OfficersPage() {
       setFullName("");
       setEmail("");
       setWorkEmail("");
-      setJurisdictionId("");
+      setJurisdictionId(null);
       reload();
     } catch (err) {
       setFormError(err instanceof ApiError ? err.message : "Failed to create officer.");
@@ -137,13 +146,12 @@ export default function OfficersPage() {
             <Field label="National ID" value={nationalId} onChange={setNationalId} required />
             <Field label="Personal email (optional)" value={email} onChange={setEmail} type="email" />
             <Field label="Work email (optional)" value={workEmail} onChange={setWorkEmail} type="email" />
-            <Field
-              label={config.jurisdictionLabel}
-              value={jurisdictionId}
-              onChange={setJurisdictionId}
-              required
-              type="number"
-            />
+            <div className="col-span-2">
+              <label className="mb-1 block text-sm font-medium text-neutral-700 dark:text-neutral-300">
+                {config.jurisdictionLabel} this officer will manage
+              </label>
+              <LocationPicker stopAt={config.pickerStopAt} onChange={setJurisdictionId} />
+            </div>
             <div>
               <label className="mb-1 block text-sm font-medium text-neutral-700 dark:text-neutral-300">
                 Specialization

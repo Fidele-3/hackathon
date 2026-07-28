@@ -1,6 +1,16 @@
 import { useAuthStore } from "./auth-store";
 
 const BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL ?? "http://localhost:8010/api/v1";
+const MEDIA_ORIGIN = BASE_URL.replace(/\/api\/v1\/?$/, "");
+
+/** Backend media fields (e.g. attachment.file) come back as a path relative
+ * to the Django origin ("/media/..."), not the "/api/v1" API base -- this
+ * resolves either an absolute URL (R2/S3, once enabled) or a relative one. */
+export function mediaUrl(path: string | null | undefined): string {
+  if (!path) return "";
+  if (path.startsWith("http://") || path.startsWith("https://")) return path;
+  return `${MEDIA_ORIGIN}${path.startsWith("/") ? path : `/${path}`}`;
+}
 
 interface Envelope<T> {
   status: "success" | "error";
