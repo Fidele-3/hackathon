@@ -138,7 +138,11 @@ SIMPLE_JWT = {
     "ROTATE_REFRESH_TOKENS": False,
 }
 
-CORS_ALLOWED_ORIGINS = env.list("CORS_ALLOWED_ORIGINS", default=["http://localhost:3000"])
+# Every host/origin allowed -- ALLOWED_HOSTS is "*" via .env already;
+# CORS_ALLOW_ALL_ORIGINS covers the browser side (any frontend origin:
+# localhost, LAN IP, deployed preview URL, tunnel, etc.) for the event.
+CORS_ALLOW_ALL_ORIGINS = True
+CORS_ALLOW_CREDENTIALS = True
 
 # --- Third-party integration keys (set in .env, never committed) --------
 GEMINI_API_KEY = env("GEMINI_API_KEY", default="")
