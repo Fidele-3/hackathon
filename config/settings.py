@@ -142,8 +142,11 @@ CORS_ALLOWED_ORIGINS = env.list("CORS_ALLOWED_ORIGINS", default=["http://localho
 GEMINI_API_KEY = env("GEMINI_API_KEY", default="")
 GOOGLE_OAUTH_CLIENT_ID = env("GOOGLE_OAUTH_CLIENT_ID", default="")
 
-CELERY_BROKER_URL = env("REDIS_URL", default="redis://localhost:6379/0")
-CELERY_RESULT_BACKEND = env("REDIS_URL", default="redis://localhost:6379/0")
+# DB indices 2/3, not 0/1 -- those are already inzufinder's local broker/
+# backend on this machine (confirmed by a leaked task landing in this
+# project's worker during testing).
+CELERY_BROKER_URL = env("REDIS_URL", default="redis://localhost:6379/2")
+CELERY_RESULT_BACKEND = env("CELERY_RESULT_BACKEND_URL", default="redis://localhost:6379/3")
 CELERY_ACCEPT_CONTENT = ["json"]
 CELERY_TASK_SERIALIZER = "json"
 CELERY_RESULT_SERIALIZER = "json"
