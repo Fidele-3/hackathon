@@ -3,13 +3,6 @@ from django.db import models
 
 
 class AIQueryLog(models.Model):
-    """
-    Every Gemini call the platform makes is logged here -- this is both the
-    audit trail for the human-approval workflow and the raw data behind the
-    'evaluation metrics' bonus criterion (accuracy/override rate is computed
-    from this table, not asserted).
-    """
-
     QUERY_CROP_DIAGNOSIS = "crop_diagnosis"
     QUERY_LIVESTOCK_QUERY = "livestock_query"
     QUERY_GENERAL_QA = "general_qa"
@@ -31,12 +24,9 @@ class AIQueryLog(models.Model):
     input_image = models.ImageField(upload_to="ai_queries/%Y/%m/", null=True, blank=True)
 
     response_text = models.TextField(blank=True)
-    # Model's own confidence, when it reports one (e.g. diagnosis certainty). Not
-    # invented by us -- null when the model didn't provide one.
+    # Null when the model itself didn't report a confidence -- never backfilled.
     confidence_score = models.FloatField(null=True, blank=True)
 
-    # True once the farmer has flagged this response as insufficient and escalated
-    # to a human officer (see reports.FarmerIssue.ai_query).
     was_escalated = models.BooleanField(default=False)
 
     created_at = models.DateTimeField(auto_now_add=True)

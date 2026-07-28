@@ -1,12 +1,4 @@
-"""
-Rwanda's real agricultural calendar (3 seasons/year), mirrored from the
-proven logic in ~/Documents/new/ImbutoTech (users/models/addresses.py Cell
-model) -- not reinvented.
-
-Season A: Sep-Feb (main season, short rains)
-Season B: Feb-Jun (main season, long rains)
-Season C: Jun-Sep (dry season, marshland/irrigated)
-"""
+# Rwanda's real 3-season agricultural calendar: A = Sep-Feb, B = Mar-Jun, C = Jul-Aug.
 from django.utils import timezone
 
 SEASON_CHOICES = [("A", "Season A"), ("B", "Season B"), ("C", "Season C")]
@@ -19,12 +11,12 @@ def get_current_season(at=None):
         return "A"
     if month in (3, 4, 5, 6):
         return "B"
-    return "C"  # 7, 8
+    return "C"
 
 
 def get_current_season_year(at=None):
     at = at or timezone.now()
-    # Season A spans two calendar years (Sep-Feb) -- attribute it to the year it starts in.
+    # Season A spans Jan-Dec boundary; attribute Jan/Feb to the year it started in.
     if at.month in (1, 2) and get_current_season(at) == "A":
         return at.year - 1
     return at.year

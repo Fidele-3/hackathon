@@ -6,14 +6,6 @@ from production.models import Land, LivestockLocation
 
 
 class FarmerIssue(models.Model):
-    """
-    The human-approval gate: raised when the AI's answer didn't resolve the
-    farmer's problem. Routed to the cell officer covering the land/livestock's
-    cell, filtered by the matching specialization (crop -> agronomist,
-    livestock -> veterinary). Nothing here is auto-actioned -- an officer
-    reviews and responds.
-    """
-
     CATEGORY_CROP = "crop"
     CATEGORY_LIVESTOCK = "livestock"
     CATEGORY_CHOICES = [(CATEGORY_CROP, "Crop"), (CATEGORY_LIVESTOCK, "Livestock")]
@@ -32,7 +24,6 @@ class FarmerIssue(models.Model):
     reporter = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name="issues_reported")
     category = models.CharField(max_length=20, choices=CATEGORY_CHOICES)
 
-    # Exactly one of these is set, matching `category`.
     land = models.ForeignKey(Land, null=True, blank=True, on_delete=models.CASCADE, related_name="issues")
     livestock_location = models.ForeignKey(
         LivestockLocation, null=True, blank=True, on_delete=models.CASCADE, related_name="issues"
