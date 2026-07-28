@@ -1,6 +1,8 @@
 from django.conf import settings
 from django.db import models
 
+from ai.media_paths import ai_query_image_upload_to
+
 
 class AIQueryLog(models.Model):
     QUERY_CROP_DIAGNOSIS = "crop_diagnosis"
@@ -21,7 +23,7 @@ class AIQueryLog(models.Model):
     model_used = models.CharField(max_length=100)
 
     input_text = models.TextField(blank=True)
-    input_image = models.ImageField(upload_to="ai_queries/%Y/%m/", null=True, blank=True)
+    input_image = models.ImageField(upload_to=ai_query_image_upload_to, null=True, blank=True)
 
     response_text = models.TextField(blank=True)
     # Null when the model itself didn't report a confidence -- never backfilled.

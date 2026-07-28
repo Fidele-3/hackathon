@@ -63,6 +63,11 @@ class OfficerProfile(models.Model):
                 ),
                 name="officer_jurisdiction_matches_level",
             ),
+            models.UniqueConstraint(
+                fields=["managed_cell", "specialization"],
+                condition=models.Q(managed_cell__isnull=False, is_active=True),
+                name="one_active_officer_per_cell_specialization",
+            ),
         ]
 
     def __str__(self):
